@@ -53,23 +53,14 @@ arguments *parser(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-    FILE *f = fopen(argv[argc - 1], "r");
-    if (f == NULL) {
-        perror("Ошибка при открытии файла");
-        return EXIT_FAILURE;
+    FILE* f = fopen(argv[argc - 1], "r");
+    char** toprint;
+    size_t* memtoprint;
+    ssize_t n = getline(toprint, memtoprint, f);
+    while (n != -1){
+        printf("%s", toprint);
     }
-
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    read = getline(&line, &len, f);
-
-    while (read != -1) {
-        printf("%s", line);
-    }
-
-    free(line);
     fclose(f);
-
-    return EXIT_SUCCESS;
+    printf("%s", argv[argc - 1]);
+    return 0;
 }

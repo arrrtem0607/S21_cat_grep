@@ -1,0 +1,3 @@
+/Users/DlyaNas/Desktop/Proga/School21/CatGrep/S21_cat_grep/cmake-build-debug/CMakeFiles/S21_cat_grep.dir
+/Users/DlyaNas/Desktop/Proga/School21/CatGrep/S21_cat_grep/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/DlyaNas/Desktop/Proga/School21/CatGrep/S21_cat_grep/cmake-build-debug/CMakeFiles/rebuild_cache.dir
