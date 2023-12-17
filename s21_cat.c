@@ -54,10 +54,10 @@ arguments *parser(int argc, char** argv) {
 
 int main(int argc, char** argv) {
     FILE* f = fopen(argv[argc - 1], "r");
-    char** toprint = NULL;
-    size_t* memtoprint = 0;
+    char* toprint = NULL;
+    size_t memtoprint = 0;
     ssize_t read;
-    while ((read = getline(toprint, memtoprint, f)) != -1){
+    while ((read = getline(&toprint, &memtoprint, f)) != -1){
         printf("%s", *toprint);
     }
     fclose(f);
