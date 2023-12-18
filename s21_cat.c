@@ -1,13 +1,29 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     int b, e, E, v, n, s, t, T;
 } arguments;
 
-arguments *parser(int argc, char** argv) {
+void parser(int argc, char** argv, arguments* arg);
+void output(int argc, char** argv);
+void output_n(int argc, char** argv);
+
+int main(int argc, char** argv) {
     arguments arg = {0};
+    parser(argc, argv, &arg);
+    /*if (arg -> n == 1) {
+        output_n(argc, argv);
+    } else {
+        output(argc, argv);
+    }*/
+    printf("\nb:%d e:%d v:%d n:%d s:%d t:%d", arg.b, arg.e, arg.v, arg.n, arg.s, arg.t);
+    return 0;
+}
+
+void parser(int argc, char** argv, arguments* arg) {
     int flag = 0;
     const struct option long_options[] = {
             {"number-nonblank", no_argument, NULL, 'b'},
@@ -19,32 +35,27 @@ arguments *parser(int argc, char** argv) {
         flag = getopt_long(argc, argv, "benstET", long_options, NULL);
         switch (flag) {
             case 'b':
-                arg.b = 1;
-                printf("b %d \n", flag);
+                arg -> b = 1;
                 break;
             case 'e':
-                arg.e = 1;
-                arg.v = 1;
-                printf("e %d \n", flag);
+                arg -> e = 1;
+                arg -> v = 1;
                 break;
             case 'n':
-                arg.n = 1;
-                printf("n %d \n", flag);
+                arg -> n = 1;
                 break;
             case 's':
-                arg.s = 1;
-                printf("s %d \n", flag);
+                arg -> s = 1;
                 break;
             case 't':
-                arg.t = 1;
-                arg.v = 1;
-                printf("t %d \n", flag);
+                arg -> t = 1;
+                arg -> v = 1;
                 break;
             case 'E':
-                arg.e = 1;
+                arg -> e = 1;
                 break;
             case 'T':
-                arg.t = 1;
+                arg -> t = 1;
                 break;
             default:
                 break;
@@ -52,15 +63,32 @@ arguments *parser(int argc, char** argv) {
     }
 }
 
-int main(int argc, char** argv) {
-    FILE* f = fopen(argv[argc - 1], "r");
-    char* toprint = NULL;
-    size_t memtoprint = 0;
-    ssize_t read;
-    while ((read = getline(&toprint, &memtoprint, f)) != -1){
-        printf("%s", *toprint);
+void output(int argc, char** argv){
+    for (int i = optind; i < argc; i++) {
+        FILE *f = fopen(argv[i], "r");
+        char *toprint = NULL;
+        size_t memtoprint = 0;
+        ssize_t read;
+        while ((read = getline(&toprint, &memtoprint, f)) != -1) {
+            printf("%s", toprint);
+        }
+        free(toprint);
+        fclose(f);
     }
-    fclose(f);
-    printf("%s", argv[argc - 1]);
-    return 0;
+}
+
+void output_n(int argc, char** argv){
+    for (int i = optind; i < argc; i++) {
+        FILE *f = fopen(argv[i], "r");
+        char *toprint = NULL;
+        size_t memtoprint = 0;
+        ssize_t read;
+        int stroka = 1;
+        while ((read = getline(&toprint, &memtoprint, f)) != -1) {
+            printf("%d %s", stroka, toprint);
+            stroka++;
+        }
+        free(toprint);
+        fclose(f);
+    }
 }

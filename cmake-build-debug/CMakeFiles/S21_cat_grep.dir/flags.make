@@ -4,7 +4,7 @@
 # compile C with /usr/bin/gcc
 C_DEFINES = 
 
-C_INCLUDES = -I/Users/DlyaNas/Desktop/Proga/School21/CatGrep/S21_cat_grep/.
+C_INCLUDES = 
 
 C_FLAGSarm64 = -g -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
 
