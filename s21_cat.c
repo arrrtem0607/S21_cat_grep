@@ -8,20 +8,15 @@ typedef struct {
 } arguments;
 
 void parser(int argc, char** argv, arguments* arg);
+void openfile(int argc, char ** argv, arguments* arg);
+void catnoflag(FILE* f);
+void cat_e(FILE* f);
+void cat_t(FILE* f);
 
 int main(int argc, char** argv) {
-    //arguments* arg = NULL;
-    //parser(argc, argv, arg);
-    for (int i = optind; i < argc; i++){
-        FILE* f = fopen(argv[i], "r");
-        if (f == NULL){
-            printf("%s: %s: No such file or directory", argv[0], argv[i]);
-        }
-        int ch;
-        while ((ch = fgetc(f)) != EOF){
-            fputc(ch, stdout);
-        }
-    }
+    arguments arg = {0};
+    parser(argc, argv, &arg);
+    openfile(argc, argv, &arg);
     return 0;
 }
 
@@ -65,7 +60,81 @@ void parser(int argc, char** argv, arguments* arg) {
     }
 }
 
-/*void cat_no_flag(int argc, char** argv, arguments* arg){
+void catnoflag(FILE* f){
+    int ch;
+    while ((ch = fgetc(f)) != EOF) {
+        fputc(ch, stdout);
+    }
+}
+
+void cat_e(FILE* f){
+    int ch;
+    while((ch = fgetc(f)) != EOF){
+        if (ch == '\n'){
+            fputc('$', stdout);
+        }
+        fputc(ch, stdout);
+    }
+}
+
+void cat_t(FILE* f){
+    int ch;
+    while((ch = fgetc(f)) != EOF){
+        if (ch == '\t'){
+            fputc('^', stdout);
+            fputc('I', stdout);
+            continue;
+        }
+        fputc(ch, stdout);
+    }
+}
+
+void cat_n(FILE* f){
+    int ch;
+    int count = 1;
+    printf("%6d  ", count);
+    while((ch = fgetc(f)) != EOF){
+        if (ch == '\n') {
+            count++;
+            printf("\n%6d  ", count);
+            continue;
+        }
+        fputc(ch, stdout);
+    }
+}
+
+void cat_s(FILE* f){
+    int ch;
+    while((ch = fgetc(f)) != EOF){
+        if (ch == '\n') {
+            continue;
+        }
+        fputc(ch, stdout);
+    }
+}
 
 
-}*/
+void openfile(int argc, char ** argv, arguments* arg){
+    for (int i = optind; i < argc; i++) {
+        FILE *f = fopen(argv[i], "r");
+        if (f == NULL) {
+            printf("%s: %s: No such file or directory\n", argv[0], argv[i]);
+            exit(1);
+        }
+        if (arg -> e) {
+            cat_e(f);
+        }
+        if (arg -> t) {
+            cat_t(f);
+        }
+        if (arg -> n) {
+            cat_n(f);
+        }
+        if (arg -> s) {
+            cat_s(f);
+        }
+        if (!arg ->b && !arg -> e && !arg -> v && !arg -> n && !arg -> s && !arg -> t){
+            catnoflag(f);
+        }
+    }
+}
