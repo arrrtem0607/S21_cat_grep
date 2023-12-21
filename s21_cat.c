@@ -8,21 +8,12 @@ typedef struct {
 } arguments;
 
 void parser(int argc, char** argv, arguments* arg);
-void output(int argc, char** argv, arguments* arg);
-void output_b(int argc, char** argv);
-void output_e(int argc, char** argv);
-void output_n(int argc, char** argv);
-void output_s(int argc, char** argv);
-void output_t(int argc, char** argv);
-void output_v(int argc, char** argv);
+void openfile(int argc, char ** argv);
 
 int main(int argc, char** argv) {
-    arguments argos = {0};
-    arguments* arg = &argos;
+    arguments* arg = NULL;
     parser(argc, argv, arg);
-    output(argc, argv);
-
-    //printf("\nb:%d e:%d v:%d n:%d s:%d t:%d", arg -> b, arg -> e, arg -> v, arg -> n, arg -> s, arg -> t);
+    openfile(argc, argv);
     return 0;
 }
 
@@ -66,65 +57,16 @@ void parser(int argc, char** argv, arguments* arg) {
     }
 }
 
-void output(int argc, char** argv, arguments* arg){
+void openfile(int argc, char ** argv){
     for (int i = optind; i < argc; i++) {
         FILE *f = fopen(argv[i], "r");
-        if (f){
-            int current;
-            int number = 1;
-            int empty_number = 1;
-            while ((current = fgetc(f)) != EOF){
-                if (arg -> b) {
-                    output_b();
-                }
-                if (arg -> e){
-                    output_e();
-                }
-                if (arg -> n){
-                    output_n();
-                }
-                if (arg -> s){
-                    output_s();
-                }
-                if (arg -> t){
-                    output_t();
-                }
-                if (arg -> v){
-                    output_v();
-                }
-            }
-            char *toprint = NULL;
-            size_t memtoprint = 0;
-            ssize_t read;
-            while ((read = getline(&toprint, &memtoprint, f)) != -1) {
-                printf("%s", toprint);
-            }
-            free(toprint);
-            fclose(f);
-        } else {
-            printf("%s: %s: No such file or directory\n",argv[0], argv[i]);
+        if (f == NULL) {
+            printf("%s: %s: No such file or directory\n", argv[0], argv[i]);
+            exit(1);
+        }
+        int ch;
+        while ((ch = fgetc(f)) != EOF) {
+            fputc(ch, stdout);
         }
     }
-}
-
-void output_b(int argc, char** argv, FILE* file){
-
-}
-void output_e(int argc, char** argv, FILE* file){
-
-}
-void output_n(int argc, char** argv, FILE* file){
-
-}
-void output_s(int argc, char** argv, FILE* file){
-
-}
-void output_t(int argc, char** argv, FILE* file){
-
-}
-void output_T(int argc, char** argv, FILE* file){
-
-}
-void output_E(int argc, char** arg, FILE* file){
-
 }
