@@ -90,16 +90,20 @@ void cat_t(FILE* f){
 }
 
 void cat_n(FILE* f){
+    int ch_pred;
     int ch;
     int count = 1;
     printf("%6d  ", count);
     while((ch = fgetc(f)) != EOF){
-        if (ch == '\n') {
+        if (ch_pred == '\n') {
             count++;
-            printf("\n%6d  ", count);
-            continue;
+            printf("%6d  ", count);
+            fputc(ch, stdout);
+            ch_pred = ch;
+        } else {
+            fputc(ch, stdout);
+            ch_pred = ch;
         }
-        fputc(ch, stdout);
     }
 }
 
