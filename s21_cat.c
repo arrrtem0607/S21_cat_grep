@@ -109,11 +109,46 @@ void cat_n(FILE* f){
 
 void cat_s(FILE* f){
     int ch;
-    while((ch = fgetc(f)) != EOF){
-        if (ch == '\n') {
+    int ch_pred = 0;
+    int flag = 1;
+    while ((ch = fgetc(f)) != EOF){
+        if (flag == 0 && ch == '\n'){
+            ch_pred = ch;
             continue;
+        } else {
+            flag = 1;
         }
-        fputc(ch, stdout);
+        if (ch == '\n' && ch_pred == '\n'){
+            fputc(ch, stdout);
+            flag = 0;
+        } else {
+            fputc(ch, stdout);
+        }
+        ch_pred = ch;
+    }
+}
+
+void cat_b(FILE* f){
+    int ch_pred;
+    int ch;
+    int count = 1;
+    printf("%6d  ", count);
+    while ((ch = fgetc(f)) != EOF){
+        if (ch == '\n' && ch_pred != '\n') {
+            count++;
+            fputc(ch, stdout);
+            ch_pred = ch;
+        } else if (ch == '\n' && ch_pred == '\n') {
+            fputc(ch, stdout);
+            ch_pred = ch;
+        } else if (ch != '\n' && ch_pred == '\n') {
+            printf("%6d  ", count);
+            fputc(ch, stdout);
+            ch_pred = ch;
+        } else {
+            fputc(ch, stdout);
+            ch_pred = ch;
+        }
     }
 }
 
@@ -136,6 +171,9 @@ void openfile(int argc, char ** argv, arguments* arg){
         }
         if (arg -> s) {
             cat_s(f);
+        }
+        if (arg -> b) {
+            cat_b(f);
         }
         if (!arg ->b && !arg -> e && !arg -> v && !arg -> n && !arg -> s && !arg -> t){
             catnoflag(f);
