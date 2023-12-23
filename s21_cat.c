@@ -9,9 +9,6 @@ typedef struct {
 
 void parser(int argc, char** argv, arguments* arg);
 void openfile(int argc, char ** argv, arguments* arg);
-void catnoflag(FILE* f);
-void cat_e(FILE* f);
-void cat_t(FILE* f);
 
 int main(int argc, char** argv) {
     arguments arg = {0};
@@ -60,97 +57,96 @@ void parser(int argc, char** argv, arguments* arg) {
     }
 }
 
-void catnoflag(FILE* f){
-    int ch;
-    while ((ch = fgetc(f)) != EOF) {
-        fputc(ch, stdout);
+void catnoflag(int * c){
+    fputc(*c, stdout);
+}
+
+void cat_e(int * ch, arguments* a) {
+    fputc('$', stdout);
+    if ((*ch == '\n' || *ch == '\t') && a -> n){
+    } else if ((*ch <= 31) && a -> n){
+        fputc('^', stdout);
+        *ch += 64;
+    } else if ((*ch == 127) && a -> n){
+        fputc('^', stdout);
+        *ch = '?';
     }
 }
 
-void cat_e(FILE* f){
-    int ch;
-    while((ch = fgetc(f)) != EOF){
-        if (ch == '\n'){
-            fputc('$', stdout);
-        }
-        fputc(ch, stdout);
+
+void cat_t(int * ch, arguments* a){
+    if (*ch == '\t'){
+        fputc('^', stdout);
+        fputc('I', stdout);
+    }
+    if ((*ch == '\n' || *ch == '\t') && a -> n){
+    } else if ((*ch <= 31) && a -> n){
+        fputc('^', stdout);
+        *ch += 64;
+    } else if ((*ch == 127) && a -> n){
+        fputc('^', stdout);
+        *ch = '?';
+    }
+    //fputc(*c, stdout);
+}
+
+void cat_n (int * nachalo, int * ch_pred, int * count){
+    if (*nachalo){
+        printf("%6d  ", *count);
+        *nachalo = 0;
+    }
+    if (*ch_pred == '\n') {
+        *count += 1;
+        printf("%6d  ", *count);
+        //fputc(*c, stdout);
+    } else {
+        //fputc(*c, stdout);
     }
 }
 
-void cat_t(FILE* f){
-    int ch;
-    while((ch = fgetc(f)) != EOF){
-        if (ch == '\t'){
-            fputc('^', stdout);
-            fputc('I', stdout);
-            continue;
-        }
-        fputc(ch, stdout);
+void cat_s(int * ch, int * ch_pred, int * s) {
+    if (*s == 0 && *ch != '\n') {
+        *s = 1;
     }
-}
-
-void cat_n(FILE* f){
-    int ch_pred;
-    int ch;
-    int count = 1;
-    printf("%6d  ", count);
-    while((ch = fgetc(f)) != EOF){
-        if (ch_pred == '\n') {
-            count++;
-            printf("%6d  ", count);
-            fputc(ch, stdout);
-            ch_pred = ch;
+    if (*s) {
+        if (*ch == '\n' && *ch_pred == '\n') {
+            //fputc(*ch, stdout);
+            *s = 0;
         } else {
-            fputc(ch, stdout);
-            ch_pred = ch;
+            //fputc(*ch, stdout);
         }
     }
 }
 
-void cat_s(FILE* f){
-    int ch;
-    int ch_pred = 0;
-    int flag = 1;
-    while ((ch = fgetc(f)) != EOF){
-        if (flag == 0 && ch == '\n'){
-            ch_pred = ch;
-            continue;
-        } else {
-            flag = 1;
-        }
-        if (ch == '\n' && ch_pred == '\n'){
-            fputc(ch, stdout);
-            flag = 0;
-        } else {
-            fputc(ch, stdout);
-        }
-        ch_pred = ch;
+void cat_b(int * ch, int * nachalo, int* ch_pred, int* count) {
+    if (*nachalo){
+        printf("%6d  ", *count);
+        *nachalo = 0;
+    }
+    if (*ch == '\n' && *ch_pred != '\n') {
+        *count += 1;
+        //fputc(*ch, stdout);
+    } else if (*ch == '\n' && *ch_pred == '\n') {
+        //fputc(*ch, stdout);
+    } else if (*ch != '\n' && *ch_pred == '\n') {
+        printf("%6d  ", *count);
+        //fputc(*ch, stdout);
+    } else {
+        //fputc(*ch, stdout);
     }
 }
 
-void cat_b(FILE* f){
-    int ch_pred;
-    int ch;
-    int count = 1;
-    printf("%6d  ", count);
-    while ((ch = fgetc(f)) != EOF){
-        if (ch == '\n' && ch_pred != '\n') {
-            count++;
-            fputc(ch, stdout);
-            ch_pred = ch;
-        } else if (ch == '\n' && ch_pred == '\n') {
-            fputc(ch, stdout);
-            ch_pred = ch;
-        } else if (ch != '\n' && ch_pred == '\n') {
-            printf("%6d  ", count);
-            fputc(ch, stdout);
-            ch_pred = ch;
-        } else {
-            fputc(ch, stdout);
-            ch_pred = ch;
-        }
+/*void cat_v(int * ch){
+    if (*ch == '\n' || *ch == '\t'){
     }
-}
+    if (*ch <= 31){
+        fputc('^', stdout);
+        fputc(*ch + 64, stdout);
+    } else if (*ch == 127){
+        fputc('^', stdout);
+        fputc('?', stdout);
+    }
+}*/
 
 
 void openfile(int argc, char ** argv, arguments* arg){
@@ -160,23 +156,23 @@ void openfile(int argc, char ** argv, arguments* arg){
             printf("%s: %s: No such file or directory\n", argv[0], argv[i]);
             exit(1);
         }
-        if (arg -> e) {
-            cat_e(f);
-        }
-        if (arg -> t) {
-            cat_t(f);
-        }
-        if (arg -> n) {
-            cat_n(f);
-        }
-        if (arg -> s) {
-            cat_s(f);
-        }
-        if (arg -> b) {
-            cat_b(f);
-        }
-        if (!arg ->b && !arg -> e && !arg -> v && !arg -> n && !arg -> s && !arg -> t){
-            catnoflag(f);
+        int ch;
+        int count = 1;
+        int nachalo = 1;
+        int ch_pred;
+        int s = 1;
+        while ((ch = fgetc(f)) != EOF) {
+            if (ch == '\n'){
+                if (arg -> e) {
+                    fputc('$', stdout);
+                }
+            } else if (ch == '\t'){
+                if (arg -> t) {
+                    fputc('^', stdout);
+                    fputc('I', stdout);
+                }
+            }
+            fputc(ch, stdout);
         }
     }
 }
